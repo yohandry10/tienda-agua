@@ -1,0 +1,27 @@
+import assert from "node:assert/strict";
+const base="http://127.0.0.1:5181";
+const admin={"oai-authenticated-user-id":"qa_admin","oai-authenticated-user-email":"admin@vaiyo.test"};
+const seller={"oai-authenticated-user-id":"qa_seller","oai-authenticated-user-email":"seller@vaiyo.test"};
+const outsider={"oai-authenticated-user-id":"qa_outsider","oai-authenticated-user-email":"outsider@vaiyo.test"};
+async function call(path,method="GET",body,headers={}){const r=await fetch(base+path,{method,headers:{"Content-Type":"application/json",...headers},...(body?{body:JSON.stringify(body)}:{})});const raw=await r.text();try{return {status:r.status,data:JSON.parse(raw)}}catch{throw new Error(method+" "+path+" returned "+r.status+": "+raw)};}
+const customer={name:"QA_INTEGRATION",phone:"999999999",address:"Dirección de prueba 123",district:"Miraflores",kind:"Hogar",payment:"Efectivo al recibir",notes:"Prueba local"};
+const payload={requestId:crypto.randomUUID(),items:[{id:"pack",qty:3}],customer};
+assert.equal((await call("/api/team")).status,401);
+assert.equal((await call("/api/team","GET",null,outsider)).status,403);
+assert.equal((await call("/api/orders","POST",{...payload,requestId:crypto.randomUUID(),items:[{id:"pack",qty:1}]})).status,400);
+assert.equal((await call("/api/orders","POST",{...payload,requestId:crypto.randomUUID(),items:[{id:"bidon",qty:1,price:1}]})).status,400);
+assert.equal((await call("/api/orders","POST",{...payload,requestId:crypto.randomUUID(),customer:{...customer,district:"Fuera de cobertura"}})).status,400);
+assert.equal((await call("/api/orders","POST",payload,{origin:"https://outside.example"})).status,403);
+assert.equal((await call("/api/orders","POST",{...payload,channel:"vendedor"},outsider)).status,403);
+const created=await call("/api/orders","POST",payload);assert.equal(created.status,201);assert.equal(created.data.total,9000);
+const again=await call("/api/orders","POST",payload);assert.equal(again.status,200);assert.equal(again.data.id,created.data.id);
+assert.equal((await call("/api/orders","POST",{...payload,customer:{...customer,name:"QA_CHANGED"}})).status,409);
+const invite=await call("/api/team","POST",{email:"seller@vaiyo.test",role:"vendedor"},admin);assert.equal(invite.status,200);
+const sellerOrder=await call("/api/orders","POST",{requestId:crypto.randomUUID(),items:[{id:"recarga",qty:2}],customer,channel:"vendedor"},seller);assert.equal(sellerOrder.status,201);assert.equal(sellerOrder.data.total,3200);
+const mine=await call("/api/team","GET",null,seller);assert.equal(mine.status,200);assert.ok(mine.data.orders.some(o=>o.id===sellerOrder.data.id));assert.ok(mine.data.orders.every(o=>o.creator_id==="qa_seller"));assert.ok(!mine.data.orders.some(o=>o.id===created.data.id));assert.deepEqual(mine.data.members,[]);
+assert.equal((await call("/api/team","PATCH",{id:created.data.id,status:"entregado"},seller)).status,403);
+assert.equal((await call("/api/team","POST",{email:"another@vaiyo.test",role:"logistica"},seller)).status,403);
+const updated=await call("/api/team","PATCH",{id:created.data.id,status:"en_ruta"},admin);assert.equal(updated.status,200);
+const all=await call("/api/team","GET",null,admin);assert.equal(all.status,200);assert.equal(all.data.orders.find(o=>o.id===created.data.id).status,"en_ruta");
+assert.equal((await call("/api/team","PATCH",{id:"VA-00000000",status:"entregado"},admin)).status,404);
+console.log(JSON.stringify({checks:17,result:"PASS",testOrders:[created.data.id,sellerOrder.data.id]}));

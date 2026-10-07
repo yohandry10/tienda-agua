@@ -1,0 +1,133 @@
+[
+  {
+    "originalPath": "C:/Users/PC/.codex/generated_images/01a11815-e685-7c91-bd45-4288cec5d7d3/exec-d7f0bec3-6d37-43e4-b730-aa515a4ec5df.png",
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "58DC4E79315BE3685EF605E979640F72CBE8C8A7E46BEB160DB951B715F5CD13",
+    "path": "C:/Users/PC/Documents/ChatGPT/empresa-de-agua/asset-staging/vaiyo-box-20l.png",
+    "identicalToOriginal": true,
+    "alpha": {
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixels": 496691,
+      "partialAlphaPixels": 1074882,
+      "opaquePixels": 1657,
+      "nonzeroBounds": [
+        0,
+        0,
+        1333,
+        1128
+      ]
+    },
+    "width": 1374,
+    "height": 1145,
+    "file": "vaiyo-box-20l.png"
+  },
+  {
+    "originalPath": "C:/Users/PC/.codex/generated_images/01a11815-e685-7c91-bd45-4288cec5d7d3/exec-d31ab95d-9ff7-4363-8a54-cbc7b7bf56c3.png",
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "3DFB9B0CE846722AFE309CA6F1EF3DE896B57F4A43184B96369EC9D0534ECF23",
+    "path": "C:/Users/PC/Documents/ChatGPT/empresa-de-agua/asset-staging/vaiyo-pack-15.png",
+    "identicalToOriginal": true,
+    "alpha": {
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 568656,
+      "partialAlphaPixels": 1004208,
+      "opaquePixels": 0,
+      "nonzeroBounds": [
+        0,
+        13,
+        1515,
+        1023
+      ]
+    },
+    "width": 1536,
+    "height": 1024,
+    "file": "vaiyo-pack-15.png"
+  },
+  {
+    "originalPath": "C:/Users/PC/.codex/generated_images/01a11815-e685-7c91-bd45-4288cec5d7d3/exec-2dc86edd-5787-4abb-8126-5cd44a4373f8.png",
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "2D3172A9BD31B4987D2D4D5684BB8BFE97734FA9BAC754E7D1436DD3C6C18792",
+    "path": "C:/Users/PC/Documents/ChatGPT/empresa-de-agua/asset-staging/vaiyo-jug-20l.png",
+    "identicalToOriginal": true,
+    "alpha": {
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 572340,
+      "partialAlphaPixels": 1000524,
+      "opaquePixels": 0,
+      "nonzeroBounds": [
+        0,
+        42,
+        1001,
+        1535
+      ]
+    },
+    "width": 1024,
+    "height": 1536,
+    "file": "vaiyo-jug-20l.png"
+  },
+  {
+    "originalPath": "C:/Users/PC/.codex/generated_images/01a11815-e685-7c91-bd45-4288cec5d7d3/exec-c856cbe7-fd14-4afc-90bb-7ac33f714ffe.png",
+    "pixelFormat": "Format32bppArgb",
+    "sha256": "BAE631D44E2677E8E5BDAB5A22047525B8CE08A25AE68D6B037476436298926A",
+    "path": "C:/Users/PC/Documents/ChatGPT/empresa-de-agua/asset-staging/vaiyo-bottle-500ml.png",
+    "identicalToOriginal": true,
+    "alpha": {
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 879483,
+      "partialAlphaPixels": 693381,
+      "opaquePixels": 0,
+      "nonzeroBounds": [
+        0,
+        32,
+        1003,
+        1531
+      ]
+    },
+    "width": 1024,
+    "height": 1536,
+    "file": "vaiyo-bottle-500ml.png"
+  },
+  {
+    "file": "hero-water.png",
+    "originalPath": "C:/Users/PC/.codex/generated_images/01a11815-e685-7c91-bd45-4288cec5d7d3/exec-3f980810-e7f7-498f-8f1b-5829997999ba.png",
+    "width": 1536,
+    "height": 1024,
+    "alpha": {
+      "alphaMin": 255,
+      "alphaMax": 255,
+      "transparentPixels": 0,
+      "partialAlphaPixels": 0,
+      "opaquePixels": 1572864
+    },
+    "pixelFormat": "Format24bppRgb",
+    "identicalToOriginal": true,
+    "validation": "PASS: photographic water wave, pale cool background, ample upper negative space, no products, logos or text",
+    "path": "C:/Users/PC/Documents/ChatGPT/empresa-de-agua/asset-staging/hero-water.png",
+    "sha256": "304864C6ACAE78931ABD363747456A46CE419DD50BC3D6FC8D5C0C23EBBDE86C"
+  },
+  {
+    "path": "C:/Users/PC/Documents/ChatGPT/empresa-de-agua/asset-staging/pack-supplied.png",
+    "pixelFormat": "Format32bppArgb",
+    "originalPath": "C:/Users/PC/.codex/generated_images/01a11815-e685-7c91-bd45-4288cec5d7d3/exec-d860b13e-a166-4114-9434-027bcb9c6a0d.png",
+    "visibleCount": 10,
+    "sha256": "944655FF4E98FBE4469B58AB0865B8B8E7E11E24BE02374FD0B4580A20294500",
+    "identicalToOriginal": true,
+    "expectedCount": 15,
+    "height": 1024,
+    "fidelity": "white caps, blue flat spiral labels and clear shrinkwrap closely match supplied bottle reference",
+    "countValidation": "FAILED: shows 5 across by 2 rows, not 3",
+    "alpha": {
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 434271,
+      "partialAlphaPixels": 1138593,
+      "opaquePixels": 0
+    },
+    "width": 1536,
+    "file": "pack-supplied.png"
+  }
+]
