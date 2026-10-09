@@ -37,7 +37,3 @@ Los pedidos de invitados se guardan en D1. La identidad de ChatGPT corresponde a
 ### Sites
 
 Proyecto Sites registrado en `.openai/hosting.json`. Usar el flujo nativo para guardar el código exacto y empaquetar `dist`; conservar la audiencia privada existente. Nunca guardar tokens ni credenciales en archivos.
-
-### Vercel
-
-`https://tienda-agua-delta.vercel.app` sirve la misma aplicación mediante una reescritura externa al Worker de `aguavaiyo.com`. Los pedidos se conservan en la misma D1; no hay una segunda base. `vercel.json` define la publicación y `scripts/build-vercel.mjs` prepara su salida. Solo los dos dominios de producción del proyecto Vercel están autorizados como orígenes adicionales en Cloudflare.

@@ -7,8 +7,7 @@
     { "pattern": "www.aguavaiyo.com", "custom_domain": true }
   ],
   "vars": {
-    "VAIYO_EXTERNAL_HOSTING": "true",
-    "VAIYO_ALLOWED_ORIGINS": "https://tienda-agua-delta.vercel.app,https://tienda-agua-trivia1.vercel.app"
+    "VAIYO_EXTERNAL_HOSTING": "true"
   },
   "d1_databases": [
     {
