@@ -1,0 +1,18 @@
+{
+  "name": "tienda-agua",
+  "account_id": "660bc78e40a631c91f2fc57ef317e848",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "aguavaiyo.com", "custom_domain": true },
+    { "pattern": "www.aguavaiyo.com", "custom_domain": true }
+  ],
+  "vars": { "VAIYO_EXTERNAL_HOSTING": "true" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "vaiyo-pedidos",
+      "database_id": "a5573aa2-2588-43dc-964e-5a6719e3591c",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

@@ -4,6 +4,15 @@ import type { ConnectorBinding } from "../lib/connector-contract.mjs";
 
 export default {
   fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
+    // Sites injects identity in its private dispatcher. An independent public
+    // Worker must never accept those identity headers from arbitrary visitors.
+    if ((env as unknown as { VAIYO_EXTERNAL_HOSTING?: string }).VAIYO_EXTERNAL_HOSTING === "true") {
+      const headers = new Headers(request.headers);
+      for (const name of [...headers.keys()]) {
+        if (name.startsWith("oai-authenticated-user-") || name.startsWith("oai-user-")) headers.delete(name);
+      }
+      request = new Request(request, { headers });
+    }
     let binding = ctx.props?.CONNECTORS;
     // Local preview emulates the same request-scoped capability. This branch and
     // the auxiliary service binding are absent from production builds.

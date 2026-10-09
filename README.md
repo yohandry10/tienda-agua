@@ -26,4 +26,14 @@ Las capturas de escritorio y móvil están en `outputs/` (ignoradas por Git). Lo
 
 ## Publicación
 
+### Cloudflare
+
+Producción: `https://aguavaiyo.com` y `https://www.aguavaiyo.com`. El repositorio `yohandry10/tienda-agua` despliega la rama `main` con `npm run build:cloudflare` y `npx wrangler deploy --config dist/server/wrangler.json`.
+
+`cloudflare.config.json` contiene los identificadores públicos del Worker, los dominios y la base D1 `vaiyo-pedidos`. La migración inicial ya está aplicada en esa base. Compilar localmente con `npm run build:cloudflare` y desplegar con `npm run deploy:cloudflare` requiere la sesión de Wrangler del propietario; no se guardan credenciales en Git.
+
+Los pedidos de invitados se guardan en D1. La identidad de ChatGPT corresponde al alojamiento Sites; la instalación independiente en Cloudflare descarta esas cabeceras externas y necesita un proveedor de acceso verificado para habilitar las cuentas y el panel del equipo. Nunca aceptar cabeceras de identidad enviadas por el visitante como autenticación.
+
+### Sites
+
 Proyecto Sites registrado en `.openai/hosting.json`. Usar el flujo nativo para guardar el código exacto y empaquetar `dist`; conservar la audiencia privada existente. Nunca guardar tokens ni credenciales en archivos.
