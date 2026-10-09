@@ -20,6 +20,8 @@ Node 22.13 o superior. Instalar con `npm run install:ci`, iniciar con `npm run d
 
 El footer enlaza a Facebook, TikTok e Instagram oficiales, entregados por el cliente.
 
+La portada revela el título por palabras y hace entrar los envases desde los lados. El desplazamiento los mueve hacia afuera y los devuelve al subir, sin atravesar el texto; en tablet y móvil se sitúan debajo. Las ocho secciones revelan sus títulos al entrar, con secuencias suaves en tarjetas, productos y distritos. El contenido permanece visible sin JavaScript. Las animaciones respetan `prefers-reduced-motion` y no añaden dependencias.
+
 ## Verificación
 
 TypeScript y compilación de producción. `checks/orders.mjs` verifica 17 casos de precios, mínimos, cobertura, origen, idempotencia, permisos y estados contra un Worker local en 5181 con D1 de prueba aislado. Sus identidades son ficticias y se usan únicamente contra localhost.
