@@ -75,7 +75,7 @@ export default function SiteFooter() {
         </nav>
       </div>
       <div className="brand-footer__signature" aria-hidden="true">
-        <span>VAIYO</span><p>La pureza que<br/>va contigo.</p>
+        <span>VAIYO</span><p>La pureza que va contigo.</p>
       </div>
     </div>
   </footer>;
