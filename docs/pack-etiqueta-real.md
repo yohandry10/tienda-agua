@@ -17,4 +17,4 @@ Use case: precise-object-edit / product-mockup. Asset type: transparent ecommerc
 
 ## Información de pago
 
-El usuario confirmó que la pasarela todavía no está conectada. Se anuncia como próxima para tarjeta, Yape y Plin. Los métodos disponibles hoy y el recorrido del pedido siguen coordinándose por WhatsApp; no se añadió un botón de cobro ni una opción de tarjeta activa.
+El usuario confirmó que la integración se realizará hoy y pidió retirar los avisos de disponibilidad futura. El texto de tarjeta, Yape y Plin se presenta únicamente en el footer y en las respuestas sobre pago. La integración de cobro es independiente de estos cambios de contenido; no se añadió un botón de cobro ni una opción de tarjeta activa.

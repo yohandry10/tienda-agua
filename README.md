@@ -12,7 +12,7 @@ Node 22.13 o superior. Instalar con `npm run install:ci`, iniciar con `npm run d
 - Los clientes autenticados ven sus pedidos en `/cuenta`. Los vendedores ven los suyos en `/operaciones`; logística cambia estados; administración gestiona el equipo.
 - Configurar `VAIYO_ADMIN_EMAILS` como variable secreta del servidor. Nunca incluirla en código del cliente.
 - La migración D1 está en `drizzle/0000_lucky_tyger_tiger.sql`.
-- Efectivo, Yape/Plin y transferencia se coordinan por WhatsApp y requieren confirmación del equipo. La web anuncia como próxima la pasarela de tarjeta, Yape y Plin; todavía no está conectada ni se ofrece pago online en el checkout.
+- Efectivo, Yape/Plin y transferencia se coordinan por WhatsApp y requieren confirmación del equipo. El footer presenta tarjeta, Yape y Plin mediante pasarela, según el contenido solicitado para la implementación prevista hoy. La integración de cobro sigue pendiente: el texto comercial no conecta un proveedor ni activa una opción de tarjeta en el checkout.
 
 ## Imágenes y marca
 
