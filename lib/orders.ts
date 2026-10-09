@@ -35,7 +35,8 @@ export function calculateItems(items:{id:string;qty:number}[]) {
 }
 export function sameOrigin(request:Request) {
  const origin=request.headers.get("origin");
- return !origin || origin===new URL(request.url).origin;
+ if (!origin || origin===new URL(request.url).origin) return true;
+ const allowed=((env as unknown as {VAIYO_ALLOWED_ORIGINS?:string}).VAIYO_ALLOWED_ORIGINS??"").split(",").map(value=>value.trim()).filter(Boolean);
+ return allowed.includes(origin);
 }
 export async function identity(){return getChatGPTUser();}
-
