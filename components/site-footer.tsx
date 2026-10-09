@@ -1,6 +1,7 @@
 import { ArrowUpRight, CreditCard, MapPin, MessageCircle, Smartphone, Truck } from "lucide-react";
 import { districts, whatsapp } from "@/lib/catalog";
 import SocialLinks from "@/components/social-links";
+import MotionToggle from "@/components/motion-toggle";
 
 export default function SiteFooter() {
   return <footer className="brand-footer">
@@ -72,6 +73,7 @@ export default function SiteFooter() {
           <a href="/privacidad">Privacidad</a>
           <a href="/condiciones">Condiciones de compra</a>
           <a href="/operaciones">Acceso del equipo <ArrowUpRight size={13}/></a>
+          <MotionToggle/>
         </nav>
       </div>
       <div className="brand-footer__signature" aria-hidden="true">

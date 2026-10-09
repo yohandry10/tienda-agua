@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+import { motionEnabled, MOTION_CHANGE_EVENT } from "@/lib/motion";
 
 export default function useHeroMotion() {
   useEffect(() => {
     const hero = document.querySelector<HTMLElement>(".hero");
     if (!hero) return;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
     let previousTime = 0;
     let position = 0;
@@ -30,11 +30,11 @@ export default function useHeroMotion() {
     const update = () => {
       const bounds = hero.getBoundingClientRect();
       destination = Math.max(0, Math.min(1, -bounds.top / (bounds.height * .8)));
-      if (reducedMotion.matches || document.hidden || bounds.bottom <= 0) {
+      if (!motionEnabled() || document.hidden || bounds.bottom <= 0) {
         cancelAnimationFrame(frame);
         frame = 0;
         previousTime = 0;
-        position = reducedMotion.matches ? 0 : destination;
+        position = motionEnabled() ? destination : 0;
         paint();
         return;
       }
@@ -45,13 +45,13 @@ export default function useHeroMotion() {
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     document.addEventListener("visibilitychange", update);
-    reducedMotion.addEventListener("change", update);
+    window.addEventListener(MOTION_CHANGE_EVENT, update);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
       document.removeEventListener("visibilitychange", update);
-      reducedMotion.removeEventListener("change", update);
+      window.removeEventListener(MOTION_CHANGE_EVENT, update);
       hero.style.removeProperty("--hero-flight");
     };
   }, []);

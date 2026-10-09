@@ -20,7 +20,7 @@ Node 22.13 o superior. Instalar con `npm run install:ci`, iniciar con `npm run d
 
 El footer enlaza a Facebook, TikTok e Instagram oficiales, entregados por el cliente.
 
-La portada revela el título por palabras y hace entrar los envases desde los lados. El desplazamiento los mueve hacia afuera y los devuelve al subir, sin atravesar el texto; en tablet y móvil se sitúan debajo. Las ocho secciones revelan sus títulos al entrar, con secuencias suaves en tarjetas, productos y distritos. El contenido permanece visible sin JavaScript. Las animaciones respetan `prefers-reduced-motion` y no añaden dependencias.
+La portada revela el título por palabras y hace entrar los envases desde los lados. El desplazamiento los mueve hacia afuera y los devuelve al subir, sin atravesar el texto; en tablet y móvil se sitúan debajo. Las ocho secciones revelan sus títulos al entrar, con secuencias suaves en tarjetas, productos y distritos. El contenido permanece visible sin JavaScript. Según la preferencia explícita del propietario, el movimiento está activado por defecto incluso cuando el navegador solicita movimiento reducido. El control «Reducir movimiento» del footer permite desactivarlo y conserva esa elección entre visitas; se aplica antes de mostrar el contenido. No se añaden dependencias.
 
 ## Verificación
 

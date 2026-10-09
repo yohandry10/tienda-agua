@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
+import { motionEnabled, MOTION_CHANGE_EVENT } from "@/lib/motion";
 
 export default function useScrollReveal() {
   useEffect(() => {
     const root = document.documentElement;
     const targets = [...document.querySelectorAll<HTMLElement>(".reveal")];
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let observer: IntersectionObserver | undefined;
 
     const setup = () => {
       observer?.disconnect();
-      if (reducedMotion.matches) {
+      if (!motionEnabled()) {
         root.classList.remove("motion-ready");
         return;
       }
@@ -27,10 +27,10 @@ export default function useScrollReveal() {
     };
 
     setup();
-    reducedMotion.addEventListener("change", setup);
+    window.addEventListener(MOTION_CHANGE_EVENT, setup);
     return () => {
       observer?.disconnect();
-      reducedMotion.removeEventListener("change", setup);
+      window.removeEventListener(MOTION_CHANGE_EVENT, setup);
       root.classList.remove("motion-ready");
     };
   }, []);
