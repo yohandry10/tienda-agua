@@ -12,11 +12,13 @@ Node 22.13 o superior. Instalar con `npm run install:ci`, iniciar con `npm run d
 - Los clientes autenticados ven sus pedidos en `/cuenta`. Los vendedores ven los suyos en `/operaciones`; logística cambia estados; administración gestiona el equipo.
 - Configurar `VAIYO_ADMIN_EMAILS` como variable secreta del servidor. Nunca incluirla en código del cliente.
 - La migración D1 está en `drizzle/0000_lucky_tyger_tiger.sql`.
-- Efectivo, Yape/Plin y transferencia requieren confirmación del equipo. No hay pasarela de tarjetas conectada.
+- Efectivo, Yape/Plin y transferencia se coordinan por WhatsApp y requieren confirmación del equipo. La web anuncia como próxima la pasarela de tarjeta, Yape y Plin; todavía no está conectada ni se ofrece pago online en el checkout.
 
 ## Imágenes y marca
 
-`public/assets` contiene el logo y las tres imágenes entregadas por el cliente, SVG originales y un fondo de agua generado. El pack de 15 es ilustrativo: cuenta 15 botellas y conserva el diseño previo de tapa azul. La generación se documenta en `docs/asset-prompts.md` y `docs/asset-metadata.json`. La variante de 10 botellas no se utiliza como pack de 15.
+`public/assets` contiene el logo y las tres imágenes entregadas por el cliente, SVG originales y un fondo de agua generado. `pack-etiqueta-real.png` es la composición ilustrativa de 15 botellas con tapa blanca y la etiqueta azul de la botella real de 500 ml. Se usa en el catálogo y el carrito. La generación se documenta en `docs/asset-prompts.md` y `docs/asset-metadata.json`. Las variantes antiguas no se utilizan para el pack publicado.
+
+El footer enlaza a Facebook, TikTok e Instagram oficiales, entregados por el cliente.
 
 ## Verificación
 

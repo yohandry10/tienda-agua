@@ -129,5 +129,25 @@
     },
     "width": 1536,
     "file": "pack-supplied.png"
+  },
+  {
+    "file": "pack-etiqueta-real.png",
+    "path": "C:\\Users\\PC\\Documents\\ChatGPT\\empresa-de-agua\\vaiyo-site\\public\\assets\\pack-etiqueta-real.png",
+    "originalPath": "C:\\Users\\PC\\.codex\\generated_images\\01a1228f-cba1-7883-8837-030216224c61\\exec-1c18ec81-65d3-43b7-957f-d97faaf6b9c5.png",
+    "width": 1536,
+    "height": 1024,
+    "pixelFormat": "Format32bppArgb",
+    "visibleCount": 15,
+    "countValidation": "PASS: three rows of five distinct white caps",
+    "labelValidation": "PASS: blue wrap label, white geometric waves, VAIYO lettering and black 500 ml drop match the supplied bottle",
+    "generatedWith": "built-in image_gen",
+    "sha256": "2467252C9E5798B01B9A7BB1A595BC1E3B47F31A5642262911A4908BE3943339",
+    "identicalToOriginal": true,
+    "cornerAlpha": [
+      0,
+      0,
+      0,
+      0
+    ]
   }
 ]

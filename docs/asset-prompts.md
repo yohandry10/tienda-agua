@@ -1,5 +1,7 @@
 # VAIYO product assets
 
+La composición publicada del pack usa ahora la etiqueta real de 500 ml y tapas blancas. El prompt final, las referencias y su validación están en [pack-etiqueta-real.md](pack-etiqueta-real.md). Los registros anteriores de este documento se conservan como historial de generación.
+
 Generated using the built-in image_gen tool, one request per asset, with transparent_background: true.
 
 Reference images (inspected before generation):
@@ -131,4 +133,3 @@ Constraints: absolutely NO text, typography, brand lettering, logo, or watermark
 - pack-supplied: transparent_background=true; reference was ONLY C:/Users/PC/Downloads/Botella de agua VAIYO 500 ml.png. The result is 1536 × 1024, Format32bppArgb, alpha range 0–254; 434,271 fully transparent pixels and 1,138,593 partially transparent pixels. White caps, blue flat spiral labels, slim bottle identity, and clear shrinkwrap closely follow the supplied photo. **COUNT FAILED: only 10 visible caps in 5 × 2, instead of the requested 15 in 5 × 3. Do not use this output to illustrate a 15-pack.** Saved unchanged for inventory at C:/Users/PC/Documents/ChatGPT/empresa-de-agua/asset-staging/pack-supplied.png.
 - Existing vaiyo-pack-15.png passes 15-cap count but uses the earlier blue-cap packaging reference.
 - Both staged follow-up files were visually inspected with view_image. SHA-256 confirms both copies exactly match their generated originals. metadata.json contains full statistics, source paths, hashes, and count failure.
-
