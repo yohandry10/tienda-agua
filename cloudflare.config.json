@@ -8,7 +8,7 @@
   ],
   "vars": {
     "VAIYO_EXTERNAL_HOSTING": "true",
-    "IZIPAY_MODE": "TEST",
+    "IZIPAY_MODE": "PRODUCTION",
     "IZIPAY_SITE_ID": "26648318",
     "IZIPAY_PUBLIC_URL": "https://aguavaiyo.com"
   },
