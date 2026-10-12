@@ -9,7 +9,8 @@ Fecha: 12 de octubre de 2026. Sitio: https://aguavaiyo.com. Tienda: 26648318. Af
 - Pedido VA-3F281BD3: abandono antes de introducir tarjeta; IPN firmada `ABANDONED`, estado `cancelado` y botón para reintentar el mismo pedido.
 - Pedido VA-B417C10B: rechazo VISA seguido de una sesión nueva Mastercard aprobada; conserva referencia y evita otro pedido.
 - D1 mantiene estos pedidos en TEST y sin confirmar reparto. El importe y la moneda proceden del servidor; el retorno del navegador no confirma pagos.
-- Verificación local: 52 comprobaciones de pagos, 13 de firma y 17 de pedidos; compilación y TypeScript correctos.
+- Verificación local: 57 comprobaciones de pagos, 13 de firma y 17 de pedidos; compilación y TypeScript correctos.
+- Idempotencia comprobada: dos preparaciones simultáneas con la misma clave devuelven un pedido/intento; dos reintentos simultáneos de un rechazo reutilizan un intento nuevo; repetir preparación o reintentar un pago autorizado/capturado devuelve su resultado, sin abrir otro pago. Una clave reutilizada con datos distintos se rechaza con 409. Las IPN duplicadas y los rechazos atrasados no degradan un pago capturado.
 
 ## Configuración guardada
 

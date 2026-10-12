@@ -30,13 +30,17 @@ equal((await ipn(result(first.data,"AUTHORISED",{vads_result:"05"}))).status,400
 equal((await ipn(result(first.data,"ACCEPTED"))).status,200);equal((await call("/api/payments/status?token="+first.data.token)).data.state,"pendiente");
 const browserReturn=await fetch(base+"/api/payments/return",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(result(first.data)),redirect:"manual"});equal(browserReturn.status,303);equal((await call("/api/payments/status?token="+first.data.token)).data.state,"pendiente");
 equal((await ipn(result(first.data,"AUTHORISED"))).status,200);equal((await call("/api/payments/status?token="+first.data.token)).data.state,"autorizado");
+equal((await call("/api/payments/retry",{token:first.data.token})).data.redirect,"/pago?token="+first.data.token);
 equal((await ipn(result(first.data,"CAPTURED",{vads_url_check_src:"RETRY"}))).status,200);equal((await ipn(result(first.data))).status,200);equal((await call("/api/payments/status?token="+first.data.token)).data.state,"pagado");
+equal((await call("/api/payments/prepare",request)).data.redirect,"/pago?token="+first.data.token);
 equal((await ipn(result(first.data,"REFUSED"))).status,200);equal((await call("/api/payments/status?token="+first.data.token)).data.state,"pagado");
 equal((await ipn(result(first.data,"ABANDONED"))).status,200);equal((await call("/api/payments/status?token="+first.data.token)).data.state,"pagado");
 equal((await call("/api/payments/retry",{token:first.data.token})).data.redirect,"/pago?token="+first.data.token);
 const rejected=(await call("/api/payments/prepare",payload())).data;
 equal((await ipn(result(rejected,"REFUSED",{vads_result:"05"}))).status,200);equal((await call("/api/payments/status?token="+rejected.token)).data.state,"rechazado");
-const retried=await call("/api/payments/retry",{token:rejected.token});equal(retried.data.id,rejected.id);assert.notEqual(retried.data.token,rejected.token);checks++;
+const [retried,concurrentRetry]=await Promise.all([call("/api/payments/retry",{token:rejected.token}),call("/api/payments/retry",{token:rejected.token})]);
+equal(retried.data.id,rejected.id);assert.notEqual(retried.data.token,rejected.token);checks++;
+equal(concurrentRetry.status,200);equal(concurrentRetry.data.id,rejected.id);equal(concurrentRetry.data.token,retried.data.token);
 equal((await ipn(result(retried.data))).status,200);equal((await ipn(result(rejected,"ABANDONED"))).status,200);
 const abandoned=(await call("/api/payments/prepare",payload())).data;
 equal((await ipn(result(abandoned,"ABANDONED",{vads_operation_type:"CREDIT"}))).status,400);
