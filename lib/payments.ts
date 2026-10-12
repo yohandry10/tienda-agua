@@ -57,15 +57,19 @@ export async function validatedAttempt(fields: PaymentFields) {
 }
 
 export async function recordNotification(fields: PaymentFields) {
-  if (!["PAY", "BO", "MERCH_BO", "BATCH", "BATCH_AUTO"].includes(fields.vads_url_check_src ?? "") || fields.vads_operation_type !== "DEBIT") return false;
+  const reject = (reason: string) => { console.warn("Izipay notification rejected:", reason); return false; };
+  if (!["PAY", "BO", "MERCH_BO", "BATCH", "BATCH_AUTO", "RETRY"].includes(fields.vads_url_check_src ?? "")) return reject("unsupported_source");
+  // An abandoned session has no financial transaction and may omit the operation type.
+  const abandonedSession = fields.vads_trans_status === "ABANDONED" && !fields.vads_operation_type;
+  if (fields.vads_operation_type !== "DEBIT" && !abandonedSession) return reject("non_debit_operation");
   const attempt = await validatedAttempt(fields);
-  if (!attempt) return false;
+  if (!attempt) return reject("signature_or_payment_identity");
   const state = gatewayState(fields.vads_trans_status ?? "");
-  if ((state === "pagado" || state === "autorizado") && (fields.vads_result !== "0" || !fields.vads_trans_uuid)) return false;
+  if ((state === "pagado" || state === "autorizado") && (fields.vads_result !== "00" || !fields.vads_trans_uuid)) return reject("invalid_approval");
   const now = new Date().toISOString();
   const db = database();
   await db.batch([
-    db.prepare("UPDATE payment_attempts SET state = ?, gateway_status = ?, gateway_uuid = COALESCE(gateway_uuid,?), updated_at = ? WHERE id = ? AND state != 'cancelado' AND (state != 'pagado' OR (? = 'CANCELLED' AND ? IN ('MERCH_BO','BO','BATCH'))) AND (state != 'autorizado' OR ? IN ('pagado','autorizado') OR ? IN ('CAPTURE_FAILED','EXPIRED','CANCELLED'))")
+    db.prepare("UPDATE payment_attempts SET state = ?, gateway_status = ?, gateway_uuid = COALESCE(gateway_uuid,?), updated_at = ? WHERE id = ? AND state != 'cancelado' AND (state != 'pagado' OR (? = 'CANCELLED' AND ? IN ('MERCH_BO','BO','BATCH','RETRY'))) AND (state != 'autorizado' OR ? IN ('pagado','autorizado') OR ? IN ('CAPTURE_FAILED','EXPIRED','CANCELLED'))")
       .bind(state, fields.vads_trans_status ?? "", fields.vads_trans_uuid || null, now, attempt.id, fields.vads_trans_status ?? "", fields.vads_url_check_src, state, fields.vads_trans_status ?? ""),
     db.prepare("UPDATE orders SET payment_status = COALESCE((SELECT state FROM payment_attempts WHERE order_id = orders.id AND state IN ('autorizado','pagado') ORDER BY CASE state WHEN 'pagado' THEN 0 ELSE 1 END LIMIT 1),(SELECT state FROM payment_attempts WHERE order_id = orders.id ORDER BY created_at DESC,id DESC LIMIT 1),'pendiente'), status = CASE WHEN payment_mode = 'PRODUCTION' AND status = 'pendiente' AND EXISTS(SELECT 1 FROM payment_attempts WHERE order_id = orders.id AND state IN ('autorizado','pagado')) THEN 'confirmado' ELSE status END, updated_at = ? WHERE id = ?")
       .bind(now, attempt.order_id)
