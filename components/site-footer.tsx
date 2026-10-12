@@ -40,7 +40,7 @@ export default function SiteFooter() {
           </div>
           <div className="brand-footer__payments" id="pagos" aria-labelledby="footer-payment-title">
             <h3 id="footer-payment-title">Paga a tu manera</h3>
-            <p>Paga con tarjeta, Yape o Plin mediante nuestra pasarela de pago.</p>
+            <p>Paga con tarjeta mediante Izipay. También aceptamos Yape y Plin por WhatsApp.</p>
             <div className="brand-footer__payment-methods" aria-label="Tarjeta, Yape y Plin">
               <span><CreditCard size={18}/> Tarjeta</span>
               <span><Smartphone size={18}/> Yape</span>

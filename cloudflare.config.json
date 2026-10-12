@@ -7,7 +7,10 @@
     { "pattern": "www.aguavaiyo.com", "custom_domain": true }
   ],
   "vars": {
-    "VAIYO_EXTERNAL_HOSTING": "true"
+    "VAIYO_EXTERNAL_HOSTING": "true",
+    "IZIPAY_MODE": "TEST",
+    "IZIPAY_SITE_ID": "26648318",
+    "IZIPAY_PUBLIC_URL": "https://aguavaiyo.com"
   },
   "d1_databases": [
     {

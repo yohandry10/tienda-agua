@@ -1,0 +1,20 @@
+import assert from "node:assert/strict";
+import { signPayment, verifyPayment, paymentFields, gatewayState } from "../lib/izipay-signature.ts";
+const sample = {vads_action_mode:"INTERACTIVE",vads_amount:"5124",vads_ctx_mode:"TEST",vads_currency:"840",vads_page_action:"PAYMENT",vads_payment_config:"SINGLE",vads_site_id:"12345678",vads_trans_date:"20170129130025",vads_trans_id:"123456",vads_version:"V2"};
+// Independent, published Izipay HMAC-SHA-256 example, including +key in the message.
+const signature = await signPayment(sample,"1122334455667788");
+assert.equal(signature,"EKrcj4e8N38LGCP/xkJMaHUajUfvsRG50mDwYLNBsMU=");
+assert.equal(await verifyPayment({...sample,signature},"1122334455667788"),true);
+assert.equal(await verifyPayment({...sample,vads_amount:"1",signature},"1122334455667788"),false);
+assert.equal(await verifyPayment({...sample,signature},"wrong-key"),false);
+assert.equal(await verifyPayment({...sample,signature:"not-a-signature"},"1122334455667788"),false);
+const unicode = {...sample,vads_cust_name:"Jesús María + Pérez"};
+assert.equal(await verifyPayment({...unicode,signature:await signPayment(unicode,"utf8-key")},"utf8-key"),true);
+assert.throws(()=>paymentFields("vads_amount=3000&vads_amount=1"),/Duplicate/);
+assert.equal(paymentFields(new URLSearchParams(unicode).toString()).vads_cust_name,unicode.vads_cust_name);
+assert.equal(gatewayState("ACCEPTED"),"pendiente");
+assert.equal(gatewayState("AUTHORISED_TO_VALIDATE"),"pendiente");
+assert.equal(gatewayState("AUTHORISED"),"autorizado");
+assert.equal(gatewayState("CAPTURED"),"pagado");
+assert.equal(gatewayState("ABANDONED"),"cancelado");
+console.log("PASS: 13 signature, encoding and state checks");

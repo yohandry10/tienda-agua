@@ -22,10 +22,11 @@ export const orderSchema=z.object({
  name:z.string().trim().min(2).max(80),
  phone:z.string().trim().max(18).regex(/^[+]?[0-9 ()-]{9,18}$/).refine(v=>v.replace(/\D/g,"").length>=9),
  address:z.string().trim().min(8).max(180),district:z.enum(districts),
- kind:z.enum(["Hogar","Empresa"]),payment:z.enum(["Efectivo al recibir","Yape o Plin","Transferencia"]),
+ kind:z.enum(["Hogar","Empresa"]),payment:z.enum(["Efectivo al recibir","Yape o Plin","Transferencia","Pago online (Izipay)"]),
+ email:z.string().trim().email().max(150).optional(),
  notes:z.string().trim().max(250).default("")
  }).strict()
-}).strict();
+}).strict().refine(data=>data.customer.payment!=="Pago online (Izipay)" || Boolean(data.customer.email),{message:"Revisa tu correo electrónico."});
 export function calculateItems(items:{id:string;qty:number}[]) {
  const seen=new Set<string>();
  return items.map(i=>{

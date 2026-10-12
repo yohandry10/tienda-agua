@@ -8,6 +8,13 @@
       "when": 1791407003704,
       "tag": "0000_lucky_tyger_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791830415471,
+      "tag": "0001_izipay_payments",
+      "breakpoints": true
     }
   ]
 }

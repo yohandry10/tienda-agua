@@ -12,7 +12,10 @@ Node 22.13 o superior. Instalar con `npm run install:ci`, iniciar con `npm run d
 - Los clientes autenticados ven sus pedidos en `/cuenta`. Los vendedores ven los suyos en `/operaciones`; logística cambia estados; administración gestiona el equipo.
 - Configurar `VAIYO_ADMIN_EMAILS` como variable secreta del servidor. Nunca incluirla en código del cliente.
 - La migración D1 está en `drizzle/0000_lucky_tyger_tiger.sql`.
-- Efectivo, Yape/Plin y transferencia se coordinan por WhatsApp y requieren confirmación del equipo. El footer presenta tarjeta, Yape y Plin mediante pasarela, según el contenido solicitado para la implementación prevista hoy. La integración de cobro sigue pendiente: el texto comercial no conecta un proveedor ni activa una opción de tarjeta en el checkout.
+- El pago online usa el formulario alojado de Izipay. Las firmas HMAC-SHA-256 se calculan en el servidor y se verifican en la IPN, contrastando tienda, modo, importe, moneda y transacción. El retorno del navegador nunca confirma el pago. La migración `0001_izipay_payments.sql` separa los intentos y el estado de pago del reparto.
+- Izipay permanece en **TEST por petición del propietario**. Los pagos de prueba no cobran dinero, no confirman entregas y no aparecen en el panel de reparto. No activar PRODUCCIÓN sin que el propietario lo solicite. Efectivo, Yape/Plin y transferencia siguen disponibles para coordinación por WhatsApp.
+- Variables: `IZIPAY_MODE=TEST`, `IZIPAY_SITE_ID=26648318`, `IZIPAY_PUBLIC_URL=https://aguavaiyo.com`. `IZIPAY_TEST_KEY` y, cuando corresponda, `IZIPAY_PRODUCTION_KEY` son secretos de Cloudflare, nunca código del cliente. La producción requiere cambiar el modo y configurar la clave correspondiente; no necesita otro checkout.
+- URLs de retorno: `/api/payments/return`; notificaciones de API Formulario: `/api/payments/ipn`, tanto test como producción. Activar notificación al final del pago, abandono y cambios del Back Office/batch. El resultado se muestra en `/pago`. Cada formulario también firma `vads_url_check` para notificar al endpoint del sitio. La regla del Back Office sigue siendo necesaria para reenvíos manuales, abandono y modificaciones posteriores. En la afiliación observada están Visa, Mastercard, Diners y American Express; Yape y Plin no aparecen en el formulario y se coordinan por WhatsApp hasta que Izipay confirme su habilitación online.
 
 ## Imágenes y marca
 
@@ -41,3 +44,9 @@ Los pedidos de invitados se guardan en D1. La identidad de ChatGPT corresponde a
 ### Sites
 
 Proyecto Sites registrado en `.openai/hosting.json`. Usar el flujo nativo para guardar el código exacto y empaquetar `dist`; conservar la audiencia privada existente. Nunca guardar tokens ni credenciales en archivos.
+
+### Estado de validación Izipay (12/10/2026)
+
+- Compilación y TypeScript correctos; 13 pruebas del vector de firma oficial, 43 casos de backend de pagos y 17 regresiones de pedidos pasaron en D1 local aislado.
+- En el formulario real de TEST se verificaron importe/referencia, retorno, reintento sin otro pedido y recepción firmada del rechazo (`REFUSED`). Las tarjetas oficiales que deberían simular aprobación fueron rechazadas por esta cuenta; falta revisar el motivo en el Back Office y confirmar el caso aprobado. No presentar la integración como validada para producción.
+- Se guardó la preferencia del panel inicial. La sesión del Back Office caducó antes de guardar la marca/contacto y las reglas de retorno, abandono y cambios. Es necesario que el propietario vuelva a iniciar sesión para completar esos ajustes. Las claves no se regeneraron; solo se instaló el secreto de TEST en Cloudflare.

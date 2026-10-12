@@ -5,7 +5,7 @@ export async function GET(){
  const user=await identity();if(!user)return Response.json({error:"Inicia sesión."},{status:401});
  try{const role=await teamRole(user);if(!role)return Response.json({error:"Sin acceso del equipo."},{status:403});
  const db=database();
- const orders=role==="vendedor"?await db.prepare("SELECT * FROM orders WHERE creator_id = ? ORDER BY created_at DESC LIMIT 100").bind(user.userId).all():await db.prepare("SELECT * FROM orders ORDER BY created_at DESC LIMIT 100").all();
+ const orders=role==="vendedor"?await db.prepare("SELECT * FROM orders WHERE creator_id = ? AND (payment_mode IS NULL OR payment_mode = 'PRODUCTION') ORDER BY created_at DESC LIMIT 100").bind(user.userId).all():await db.prepare("SELECT * FROM orders WHERE payment_mode IS NULL OR payment_mode = 'PRODUCTION' ORDER BY created_at DESC LIMIT 100").all();
  const members=role==="admin"?(await db.prepare("SELECT email, role FROM team ORDER BY email").all()).results:[];
  return Response.json({orders:orders.results,role,members});}catch{ return Response.json({error:"No pudimos cargar los pedidos."},{status:503});}
 }
@@ -16,7 +16,7 @@ export async function PATCH(request:Request){
  const user=await identity();if(!user)return Response.json({error:"Inicia sesión."},{status:401});
  const role=await teamRole(user);if(!["admin","logistica"].includes(role??""))return Response.json({error:"Solo logística puede cambiar el estado."},{status:403});
  const data=z.object({id:z.string().regex(/^VA-[A-F0-9]{8}$/),status:z.enum(statuses)}).strict().parse(input);
- const result=await database().prepare("UPDATE orders SET status = ?, updated_at = ? WHERE id = ?").bind(data.status,new Date().toISOString(),data.id).run();
+ const result=await database().prepare("UPDATE orders SET status = ?, updated_at = ? WHERE id = ? AND (payment_mode IS NULL OR payment_mode = 'PRODUCTION')").bind(data.status,new Date().toISOString(),data.id).run();
  if(!result.meta.changes)return Response.json({error:"Pedido no encontrado."},{status:404});return Response.json({ok:true});
  }catch{return Response.json({error:"No pudimos actualizar el pedido."},{status:400});}
 }
