@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-10-27T00:23:05.589Z",
+        "reason": "Revisión de Codex: el borde superior pertenece al pie de página rectangular; la regla no aplica borde redondeado a ese elemento."
+      }
+    ]
+  }
+}

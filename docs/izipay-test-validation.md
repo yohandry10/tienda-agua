@@ -18,9 +18,11 @@ Nombre VAIYO, https://aguavaiyo.com, teléfono público +51 967 232 782, logo y 
 
 Activadas y parametrizadas las reglas de pago finalizado, abandono, modificación por vendedor y modificación por lote, con reejecución automática ante fallo. Los intentos adicionales en la sesión del proveedor están en cero; VAIYO permite reintentar con un identificador nuevo y la misma referencia de pedido.
 
-La web sigue en TEST. Configurar direcciones de retorno e IPN de producción no activa cobros. La clave de producción no se ha instalado y las claves existentes no se regeneraron. El formulario de esta afiliación muestra Visa, Mastercard, Diners y American Express; Yape/Plin siguen por coordinación de WhatsApp.
+Durante esta validación inicial la web permanecía en TEST y no estaba instalada la clave de producción. Posteriormente, con autorización del propietario, se publicó PRODUCTION y se verificaron el formulario VISA y la IPN de cancelación sin cobro; véase `izipay-production-deployment.md`. Las claves existentes no se regeneraron. El formulario de esta afiliación muestra Visa, Mastercard, Diners y American Express; Yape/Plin siguen por coordinación de WhatsApp.
 
-## Incidencia pendiente de Izipay: VISA TEST
+## Incidencia histórica detectada: VISA TEST
+
+El propietario informó después de estas pruebas que Claude dejó VISA resuelta. Los resultados siguientes conservan la evidencia de la investigación inicial; no describen una nueva prueba de aprobación real.
 
 Las tarjetas oficiales VISA que deberían simular aprobación (terminaciones 0210, 0228 y 1029) reciben `227: Autenticación imposible`. Se comprobó también una tarjeta sin enrolamiento (0048), una sesión en la pestaña visible del usuario y una petición con `vads_threeds_mpi=3` para solicitar autenticación fuerte. La variante no resolvió el rechazo; la configuración final conserva la preferencia del emisor y las protecciones 3DS.
 
@@ -46,4 +48,4 @@ Este mensaje está preparado; no se ha enviado a terceros.
 - [Tarjetas de prueba](https://secure.micuentaweb.pe/doc/es-PE/form-payment/test-cards/sitemap.html).
 - [Guía 3D Secure](https://secure.micuentaweb.pe/doc/es-PE/guides/3DSecure/sitemap.html).
 
-El paso posterior a producción requiere autorización del propietario, clave de producción, cambio de modo y una comprobación final del entorno real. El test no sustituye esa comprobación.
+El paso posterior a producción fue autorizado y ejecutado el 12/10/2026. La comprobación sin tarjeta del formulario y la cancelación no sustituye una compra real: la primera autorización bancaria real sigue pendiente de una compra del propietario o cliente.

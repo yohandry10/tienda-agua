@@ -21,7 +21,10 @@ equal((await call("/api/payments/prepare",{...payload(),items:[{id:"pack",qty:1}
 const missing=payload();delete missing.customer.email;equal((await call("/api/payments/prepare",missing)).status,400);customer.email="qa-izipay@example.test";
 const request=payload();const [first,repeat]=await Promise.all([call("/api/payments/prepare",request),call("/api/payments/prepare",request)]);
 equal(first.status,200);equal(repeat.status,200);equal(first.data.id,repeat.data.id);equal(first.data.token,repeat.data.token);equal(first.data.fields.vads_amount,"3000");equal(first.data.fields.vads_currency,"604");equal(first.data.fields.signature,sign(first.data.fields));
-equal(first.data.fields.vads_ctx_mode,mode);equal(first.data.fields.vads_order_info,"1 x Bidón de 20 L");equal(first.data.fields.vads_order_info2,"Hogar · PRUEBA SIN ENTREGA");equal(first.data.fields.vads_cust_district,"Miraflores");
+equal(first.data.fields.vads_ctx_mode,mode);equal(first.data.fields.vads_order_info,"1 x Bidón de 20 L");equal(first.data.fields.vads_order_info2,"Hogar · Distrito: Miraflores");equal(first.data.fields.vads_order_info3,"PRUEBA SIN ENTREGA");equal(first.data.fields.vads_cust_district,"Miraflores");equal(first.data.fields.vads_cust_address2,"Distrito: Miraflores");
+const receipt=(await call("/api/payments/status?token="+first.data.token)).data;
+assert.deepEqual(receipt.items,[{name:"Bidón de 20 L",qty:1,price:3000}]);checks++;
+assert.deepEqual(Object.keys(receipt).sort(),["id","total","mode","state","items"].sort());checks++;
 equal((await ipn({...result(first.data),signature:"forged"})).status,400);
 equal((await ipn(result(first.data,"CAPTURED",{vads_amount:"1"}))).status,400);
 equal((await ipn(result(first.data,"CAPTURED",{vads_currency:"840"}))).status,400);
