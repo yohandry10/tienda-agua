@@ -19,5 +19,8 @@
       "database_id": "a5573aa2-2588-43dc-964e-5a6719e3591c",
       "migrations_dir": "drizzle"
     }
+  ],
+  "ratelimits": [
+    { "name": "ORDER_LIMITER", "namespace_id": "1001", "simple": { "limit": 6, "period": 60 } }
   ]
 }

@@ -4,7 +4,10 @@ import hostingConfig from "./.openai/hosting.json";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { sites } from "./build/sites-vite-plugin";
 import { connectorPreview } from "./build/connector-preview-plugin.mjs";
-import cloudflareProduction from "./cloudflare.config.json";
+import cloudflareConfig from "./cloudflare.config.json";
+
+// JSON imports widen literals; Cloudflare rate limits only accept 10 or 60 second periods.
+const cloudflareProduction = { ...cloudflareConfig, ratelimits: cloudflareConfig.ratelimits.map(limit => ({ ...limit, simple: { ...limit.simple, period: limit.simple.period as 10 | 60 } })) };
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   "00000000-0000-4000-8000-000000000000";
