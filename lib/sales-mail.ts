@@ -50,6 +50,7 @@ async function send(apiKey: string, key: string, message: object) {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: "Bearer " + apiKey, "Content-Type": "application/json", "Idempotency-Key": key },
+    signal: AbortSignal.timeout(10000),
     body: JSON.stringify({ ...message, attachments: [{ filename: "vaiyo-logo.jpg", content: EMAIL_LOGO_BASE64, content_id: "vaiyo-logo" }] })
   });
   if (!response.ok) throw new Error("Resend " + response.status + ": " + (await response.text()).slice(0, 200));
@@ -63,11 +64,23 @@ export async function notifySales(orderId: string, payment?: PaymentFields) {
   const db = database();
   const claim = await db.prepare("UPDATE orders SET notified_at = ? WHERE id = ? AND notified_at IS NULL").bind(new Date().toISOString(), orderId).run();
   if (!claim.meta.changes) return;
-  const order = await db.prepare("SELECT id,name,phone,email,address,district,kind,ruc,receipt,dni,business_name,payment,payment_status,notes,items,total,created_at FROM orders WHERE id = ?").bind(orderId).first<MailOrder>();
+  let order: MailOrder | null;
+  try {
+    order = await db.prepare("SELECT id,name,phone,email,address,district,kind,ruc,receipt,dni,business_name,payment,payment_status,notes,items,total,created_at FROM orders WHERE id = ?").bind(orderId).first<MailOrder>();
+  } catch (error) {
+    await db.prepare("UPDATE orders SET notified_at = NULL WHERE id = ?").bind(orderId).run();
+    console.error("Sales e-mail failed", orderId, error instanceof Error ? error.message : "unknown");
+    return;
+  }
   if (!order) return;
-  const paid = Boolean(payment) || ["autorizado", "pagado"].includes(order.payment_status);
+  const paid = ["autorizado", "pagado"].includes(order.payment_status);
+  // A card order is a sale only once Izipay's approval is recorded.
+  if (order.payment === "Pago online (Izipay)" && !paid) {
+    await db.prepare("UPDATE orders SET notified_at = NULL WHERE id = ?").bind(orderId).run();
+    return;
+  }
   const paymentRows: Row[] = [["Método", order.payment], ["Estado", paid ? "PAGADO con tarjeta (Izipay)" : pending[order.payment] ?? "PENDIENTE"]];
-  if (payment) paymentRows.push(
+  if (paid && payment) paymentRows.push(
     ["Transacción Izipay", payment.vads_trans_uuid ?? ""], ["N.° de autorización", payment.vads_auth_number ?? ""],
     ["Tarjeta", [payment.vads_card_brand, payment.vads_card_number].filter(Boolean).join(" ")], ["Fecha del pago", gatewayDate(payment.vads_effective_creation_date ?? payment.vads_trans_date)],
     ["Importe pagado", money(Number(payment.vads_amount))]
@@ -100,7 +113,7 @@ export async function notifySales(orderId: string, payment?: PaymentFields) {
       html: layout("¡Gracias, " + order.name.split(" ")[0] + "!", (paid ? "Tu pago fue aprobado. " : "Recibimos tu pedido. ") + "Te enviaremos tu " + (order.receipt ?? "boleta").toLowerCase() + " electrónica a este correo o por WhatsApp. Coordinaremos la entrega contigo al " + order.phone + ".", [
         ["Tu pedido", [["Número", order.id], ["Fecha", limaDate(order.created_at)]]],
         ["Comprobante", receiptRows(order)],
-        ["Pago", paid ? [["Estado", "Aprobado con tarjeta"], ...(payment ? [["N.° de autorización", payment.vads_auth_number ?? ""] as Row] : [])] : [["Método", order.payment], ["Siguiente paso", customerPayment[order.payment] ?? "Te contactaremos por WhatsApp."]]],
+        ["Pago", paid ? [["Estado", "Aprobado con tarjeta"], ...(payment?.vads_auth_number ? [["N.° de autorización", payment.vads_auth_number] as Row] : [])] : [["Método", order.payment], ["Siguiente paso", customerPayment[order.payment] ?? "Te contactaremos por WhatsApp."]]],
         ["Entrega", delivery]
       ], order),
       text: "Gracias por tu pedido " + order.id + ". Total: " + money(order.total) + ". Te enviaremos tu comprobante a este correo o por WhatsApp. Escríbenos: " + whatsapp("Hola VAIYO, mi pedido es " + order.id)
