@@ -22,5 +22,6 @@
   ],
   "ratelimits": [
     { "name": "ORDER_LIMITER", "namespace_id": "1001", "simple": { "limit": 6, "period": 60 } }
-  ]
+  ],
+  "triggers": { "crons": ["*/10 * * * *"] }
 }

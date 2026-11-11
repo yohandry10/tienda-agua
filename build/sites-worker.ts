@@ -1,8 +1,13 @@
 import handler from "vinext/server/fetch-handler";
 import { runWithConnectorBinding } from "../lib/connector-context";
 import type { ConnectorBinding } from "../lib/connector-contract.mjs";
+import { resendMissingNotifications } from "../lib/sales-mail";
 
 export default {
+  // Cron trigger: retries the e-mail of any recent sale that could not be sent.
+  scheduled(_controller: ScheduledController, _env: Cloudflare.Env, ctx: ExecutionContext) {
+    ctx.waitUntil(resendMissingNotifications());
+  },
   fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
     // Sites injects identity in its private dispatcher. An independent public
     // Worker must never accept those identity headers from arbitrary visitors.

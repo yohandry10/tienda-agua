@@ -7,7 +7,7 @@ import { EMAIL_LOGO_BASE64 } from "@/lib/email-logo";
 const SALES_EMAIL = "clientesc@aguavaiyo.com";
 const FROM = "VAIYO <pedidos@aguavaiyo.com>";
 const LOGO = "cid:vaiyo-logo";
-type MailOrder = { id: string; name: string; phone: string; email: string | null; address: string; district: string; kind: string; ruc: string | null; receipt: string | null; dni: string | null; business_name: string | null; payment: string; notes: string; items: string; total: number; created_at: string };
+type MailOrder = { id: string; name: string; phone: string; email: string | null; address: string; district: string; kind: string; ruc: string | null; receipt: string | null; dni: string | null; business_name: string | null; payment: string; payment_status: string; notes: string; items: string; total: number; created_at: string };
 type Row = [string, string];
 
 const pending: Record<string, string> = {
@@ -63,9 +63,10 @@ export async function notifySales(orderId: string, payment?: PaymentFields) {
   const db = database();
   const claim = await db.prepare("UPDATE orders SET notified_at = ? WHERE id = ? AND notified_at IS NULL").bind(new Date().toISOString(), orderId).run();
   if (!claim.meta.changes) return;
-  const order = await db.prepare("SELECT id,name,phone,email,address,district,kind,ruc,receipt,dni,business_name,payment,notes,items,total,created_at FROM orders WHERE id = ?").bind(orderId).first<MailOrder>();
+  const order = await db.prepare("SELECT id,name,phone,email,address,district,kind,ruc,receipt,dni,business_name,payment,payment_status,notes,items,total,created_at FROM orders WHERE id = ?").bind(orderId).first<MailOrder>();
   if (!order) return;
-  const paymentRows: Row[] = [["Método", order.payment], ["Estado", payment ? "PAGADO con tarjeta (Izipay)" : pending[order.payment] ?? "PENDIENTE"]];
+  const paid = Boolean(payment) || ["autorizado", "pagado"].includes(order.payment_status);
+  const paymentRows: Row[] = [["Método", order.payment], ["Estado", paid ? "PAGADO con tarjeta (Izipay)" : pending[order.payment] ?? "PENDIENTE"]];
   if (payment) paymentRows.push(
     ["Transacción Izipay", payment.vads_trans_uuid ?? ""], ["N.° de autorización", payment.vads_auth_number ?? ""],
     ["Tarjeta", [payment.vads_card_brand, payment.vads_card_number].filter(Boolean).join(" ")], ["Fecha del pago", gatewayDate(payment.vads_effective_creation_date ?? payment.vads_trans_date)],
@@ -76,7 +77,7 @@ export async function notifySales(orderId: string, payment?: PaymentFields) {
     const title = "Pedido web " + order.id;
     await send(apiKey, "vaiyo-order-" + order.id, {
       from: FROM, to: [SALES_EMAIL], ...(order.email ? { reply_to: order.email } : {}),
-      subject: title + " · " + (payment ? "PAGADO" : "Pago pendiente") + " · " + money(order.total) + " · " + (order.receipt ?? "Boleta"),
+      subject: title + " · " + (paid ? "PAGADO" : "Pago pendiente") + " · " + money(order.total) + " · " + (order.receipt ?? "Boleta"),
       html: layout(title, "Emite el comprobante en SUNAT con estos datos. Registrado el " + limaDate(order.created_at), [
         ["Datos para emitir en SUNAT", [...receiptRows(order), ["Correo del cliente", order.email ?? "No indicó"], ["Total a facturar", money(order.total)]]],
         ["Pago", paymentRows],
@@ -95,16 +96,29 @@ export async function notifySales(orderId: string, payment?: PaymentFields) {
   try {
     await send(apiKey, "vaiyo-customer-" + order.id, {
       from: FROM, to: [order.email], reply_to: SALES_EMAIL,
-      subject: "Tu pedido VAIYO " + order.id + (payment ? " · Pago aprobado" : " · Recibido"),
-      html: layout("¡Gracias, " + order.name.split(" ")[0] + "!", (payment ? "Tu pago fue aprobado. " : "Recibimos tu pedido. ") + "Te enviaremos tu " + (order.receipt ?? "boleta").toLowerCase() + " electrónica a este correo o por WhatsApp. Coordinaremos la entrega contigo al " + order.phone + ".", [
+      subject: "Tu pedido VAIYO " + order.id + (paid ? " · Pago aprobado" : " · Recibido"),
+      html: layout("¡Gracias, " + order.name.split(" ")[0] + "!", (paid ? "Tu pago fue aprobado. " : "Recibimos tu pedido. ") + "Te enviaremos tu " + (order.receipt ?? "boleta").toLowerCase() + " electrónica a este correo o por WhatsApp. Coordinaremos la entrega contigo al " + order.phone + ".", [
         ["Tu pedido", [["Número", order.id], ["Fecha", limaDate(order.created_at)]]],
         ["Comprobante", receiptRows(order)],
-        ["Pago", payment ? [["Estado", "Aprobado con tarjeta"], ["N.° de autorización", payment.vads_auth_number ?? ""]] : [["Método", order.payment], ["Siguiente paso", customerPayment[order.payment] ?? "Te contactaremos por WhatsApp."]]],
+        ["Pago", paid ? [["Estado", "Aprobado con tarjeta"], ...(payment ? [["N.° de autorización", payment.vads_auth_number ?? ""] as Row] : [])] : [["Método", order.payment], ["Siguiente paso", customerPayment[order.payment] ?? "Te contactaremos por WhatsApp."]]],
         ["Entrega", delivery]
       ], order),
       text: "Gracias por tu pedido " + order.id + ". Total: " + money(order.total) + ". Te enviaremos tu comprobante a este correo o por WhatsApp. Escríbenos: " + whatsapp("Hola VAIYO, mi pedido es " + order.id)
     });
   } catch (error) {
     console.error("Customer e-mail failed", orderId, error instanceof Error ? error.message : "unknown");
+  }
+}
+
+// Safety net run by the cron trigger: sends the e-mail of any sale from the last 24 hours that has none yet
+// (e.g. Resend was down). Card orders count as sales only once approved; TEST payments never do.
+export async function resendMissingNotifications() {
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { results } = await database().prepare("SELECT id FROM orders WHERE notified_at IS NULL AND channel = 'web' AND status != 'cancelado' AND created_at >= ? AND (payment_mode IS NULL OR (payment_mode = 'PRODUCTION' AND payment_status IN ('autorizado','pagado'))) ORDER BY created_at LIMIT 20").bind(since).all<{ id: string }>();
+    console.info("Sales e-mail retry: " + results.length + " pending");
+    for (const { id } of results) await notifySales(id);
+  } catch (error) {
+    console.error("Sales e-mail retry failed", error instanceof Error ? error.stack ?? error.message : "unknown");
   }
 }
