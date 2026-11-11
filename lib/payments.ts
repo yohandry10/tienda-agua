@@ -1,6 +1,7 @@
 import { database } from "@/lib/orders";
 import { paymentConfig, modeKey } from "@/lib/izipay-config";
 import { signPayment, verifyPayment, gatewayState, type PaymentFields } from "@/lib/izipay-signature";
+import { notifySales } from "@/lib/sales-mail";
 
 export const PAYMENT_ACTION = "https://secure.micuentaweb.pe/vads-payment/";
 export type PaymentAttempt = { id: string; order_id: string; mode: string; token: string; trans_id: string; trans_date: string; amount: number; state: string; gateway_status: string | null; gateway_uuid: string | null };
@@ -92,5 +93,6 @@ export async function recordNotification(fields: PaymentFields) {
     db.prepare("UPDATE orders SET payment_status = COALESCE((SELECT state FROM payment_attempts WHERE order_id = orders.id AND state IN ('autorizado','pagado') ORDER BY CASE state WHEN 'pagado' THEN 0 ELSE 1 END LIMIT 1),(SELECT state FROM payment_attempts WHERE order_id = orders.id ORDER BY created_at DESC,id DESC LIMIT 1),'pendiente'), status = CASE WHEN payment_mode = 'PRODUCTION' AND status = 'pendiente' AND EXISTS(SELECT 1 FROM payment_attempts WHERE order_id = orders.id AND state IN ('autorizado','pagado')) THEN 'confirmado' WHEN ? = 1 AND payment_mode = 'PRODUCTION' AND status = 'confirmado' AND NOT EXISTS(SELECT 1 FROM payment_attempts WHERE order_id = orders.id AND state IN ('autorizado','pagado')) THEN 'pendiente' ELSE status END, updated_at = ? WHERE id = ?")
       .bind(revoked, now, attempt.order_id)
   ]);
+  if (attempt.mode === "PRODUCTION" && (state === "autorizado" || state === "pagado")) await notifySales(attempt.order_id, fields).catch(() => {});
   return true;
 }

@@ -1,4 +1,8 @@
-export const districts = ["Magdalena", "San Isidro", "Miraflores", "Barranco", "Surco", "Jesús María", "Lince", "Pueblo Libre", "San Luis", "San Borja", "San Miguel"] as const;
+// Retail (Hogar) delivery coverage.
+export const districts = ["Magdalena", "San Isidro", "Miraflores", "Barranco", "Surco", "Surquillo", "Jesús María", "Lince", "Pueblo Libre", "San Luis", "San Borja", "San Miguel", "Breña", "La Victoria (Santa Catalina)"] as const;
+// Wholesale (Empresa) delivery coverage: every district of Lima.
+export const businessDistricts = ["Ancón", "Ate", "Barranco", "Breña", "Carabayllo", "Cercado de Lima", "Chaclacayo", "Chorrillos", "Cieneguilla", "Comas", "El Agustino", "Independencia", "Jesús María", "La Molina", "La Victoria", "Lince", "Los Olivos", "Lurigancho", "Lurín", "Magdalena", "Miraflores", "Pachacámac", "Pucusana", "Pueblo Libre", "Puente Piedra", "Punta Hermosa", "Punta Negra", "Rímac", "San Bartolo", "San Borja", "San Isidro", "San Juan de Lurigancho", "San Juan de Miraflores", "San Luis", "San Martín de Porres", "San Miguel", "Santa Anita", "Santa María del Mar", "Santa Rosa", "Surco", "Surquillo", "Villa El Salvador", "Villa María del Triunfo"] as const;
+export const districtsFor = (kind: string): readonly string[] => kind === "Empresa" ? businessDistricts : districts;
 export const products = [
  { id: "bidon", name: "Bidón de 20 L", subtitle: "Para toda la casa", price: 3000, min: 1, image: "/assets/bidon.png", detail: "Primera compra: agua + envase retornable con caño." },
  { id: "recarga", name: "Recarga de 20 L", subtitle: "Tu bidón, una nueva vida", price: 1600, min: 1, image: "/assets/bidon.png", detail: "Recarga para tu bidón retornable. Entrega incluida." },

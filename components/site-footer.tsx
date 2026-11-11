@@ -66,7 +66,7 @@ export default function SiteFooter() {
 
       <div className="brand-footer__coverage">
         <b><Truck size={18}/> DELIVERY INCLUIDO</b>
-        <p>{districts.join(" · ")}</p>
+        <p>{districts.join(" · ")} · Empresas: todo Lima</p>
       </div>
       <div className="brand-footer__legal">
         <span>© {new Date().getFullYear()} VAIYO. Todos los derechos reservados.</span>

@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { getChatGPTUser, type ChatGPTUser } from "@/app/chatgpt-auth";
-import { findProduct, districts } from "@/lib/catalog";
+import { findProduct, districtsFor } from "@/lib/catalog";
 import { z } from "zod";
 export const statuses=["pendiente","confirmado","en_ruta","entregado","cancelado"] as const;
 export type Order = { id:string;name:string;phone:string;address:string;district:string;kind:string;payment:string;notes:string;items:string;total:number;status:string;channel:string;created_at:string;creator_id:string|null };
@@ -21,12 +21,14 @@ export const orderSchema=z.object({
  customer:z.object({
  name:z.string().trim().min(2).max(80),
  phone:z.string().trim().max(18).regex(/^[+]?[0-9 ()-]{9,18}$/).refine(v=>v.replace(/\D/g,"").length>=9),
- address:z.string().trim().min(8).max(180),district:z.enum(districts),
+ address:z.string().trim().min(8).max(180),district:z.string().max(60),
  kind:z.enum(["Hogar","Empresa"]),payment:z.enum(["Efectivo al recibir","Yape o Plin","Transferencia","Pago online (Izipay)"]),
+ ruc:z.string().trim().regex(/^(10|15|17|20)\d{9}$/).optional(),
  email:z.string().trim().email().max(150).optional(),
  notes:z.string().trim().max(250).default("")
- }).strict()
-}).strict().refine(data=>data.customer.payment!=="Pago online (Izipay)" || Boolean(data.customer.email),{message:"Revisa tu correo electrónico."});
+ }).strict().refine(customer=>districtsFor(customer.kind).includes(customer.district),{message:"Revisa la cobertura de entrega."})
+}).strict().refine(data=>data.customer.payment!=="Pago online (Izipay)" || Boolean(data.customer.email),{message:"Revisa tu correo electrónico."})
+ .refine(data=>data.customer.kind!=="Empresa" || data.channel==="vendedor" || Boolean(data.customer.ruc),{message:"Revisa el RUC de tu empresa."});
 export function calculateItems(items:{id:string;qty:number}[]) {
  const seen=new Set<string>();
  return items.map(i=>{

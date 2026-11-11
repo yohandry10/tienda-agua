@@ -12,6 +12,15 @@ assert.equal((await call("/api/orders","POST",{...payload,requestId:crypto.rando
 assert.equal((await call("/api/orders","POST",{...payload,requestId:crypto.randomUUID(),items:[{id:"bidon",qty:1,price:1}]})).status,400);
 assert.equal((await call("/api/orders","POST",{...payload,requestId:crypto.randomUUID(),customer:{...customer,district:"Fuera de cobertura"}})).status,400);
 assert.equal((await call("/api/orders","POST",payload,{origin:"https://outside.example"})).status,403);
+// Coverage: retail (Hogar) districts only; Empresa reaches all of Lima and needs a valid RUC.
+const order=(c)=>call("/api/orders","POST",{...payload,requestId:crypto.randomUUID(),customer:{...customer,...c}});
+assert.equal((await order({district:"Comas"})).status,400);
+assert.equal((await order({district:"Surquillo"})).status,201);
+assert.equal((await order({district:"La Victoria (Santa Catalina)"})).status,201);
+assert.equal((await order({kind:"Empresa",district:"Comas"})).status,400);
+assert.equal((await order({kind:"Empresa",district:"Comas",ruc:"123"})).status,400);
+assert.equal((await order({kind:"Empresa",district:"Comas",ruc:"20123456789"})).status,201);
+assert.equal((await order({kind:"Empresa",district:"Planeta",ruc:"20123456789"})).status,400);
 assert.equal((await call("/api/orders","POST",{...payload,channel:"vendedor"},outsider)).status,403);
 const created=await call("/api/orders","POST",payload);assert.equal(created.status,201);assert.equal(created.data.total,9000);
 const again=await call("/api/orders","POST",payload);assert.equal(again.status,200);assert.equal(again.data.id,created.data.id);
