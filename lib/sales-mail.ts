@@ -2,10 +2,11 @@ import { env } from "cloudflare:workers";
 import { database } from "@/lib/orders";
 import { money, whatsapp } from "@/lib/catalog";
 import type { PaymentFields } from "@/lib/izipay-signature";
+import { EMAIL_LOGO_BASE64 } from "@/lib/email-logo";
 
 const SALES_EMAIL = "clientesc@aguavaiyo.com";
 const FROM = "VAIYO <pedidos@aguavaiyo.com>";
-const LOGO = "https://aguavaiyo.com/assets/vaiyo-logo-email.png";
+const LOGO = "cid:vaiyo-logo";
 type MailOrder = { id: string; name: string; phone: string; email: string | null; address: string; district: string; kind: string; ruc: string | null; receipt: string | null; dni: string | null; business_name: string | null; payment: string; notes: string; items: string; total: number; created_at: string };
 type Row = [string, string];
 
@@ -49,7 +50,7 @@ async function send(apiKey: string, key: string, message: object) {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: "Bearer " + apiKey, "Content-Type": "application/json", "Idempotency-Key": key },
-    body: JSON.stringify(message)
+    body: JSON.stringify({ ...message, attachments: [{ filename: "vaiyo-logo.jpg", content: EMAIL_LOGO_BASE64, content_id: "vaiyo-logo" }] })
   });
   if (!response.ok) throw new Error("Resend " + response.status + ": " + (await response.text()).slice(0, 200));
 }
