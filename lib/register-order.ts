@@ -20,8 +20,9 @@ export async function registerOrder(data: z.infer<typeof orderSchema>) {
   const id = "VA-" + crypto.randomUUID().slice(0, 8).toUpperCase();
   const now = new Date().toISOString();
   const customer = data.customer;
-  await db.prepare("INSERT INTO orders (id,request_id,fingerprint,user_id,creator_id,name,phone,address,district,kind,payment,notes,items,total,status,channel,created_at,updated_at,email,payment_mode,ruc) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(request_id) DO NOTHING")
-    .bind(id, data.requestId, fingerprint, channel === "web" ? user?.userId ?? null : null, user?.userId ?? null, customer.name, customer.phone, customer.address, customer.district, customer.kind, customer.payment, customer.notes, JSON.stringify(items), total, "pendiente", channel, now, now, customer.email ?? null, paymentMode, customer.kind === "Empresa" ? customer.ruc ?? null : null).run();
+  const factura = customer.receipt === "Factura";
+  await db.prepare("INSERT INTO orders (id,request_id,fingerprint,user_id,creator_id,name,phone,address,district,kind,payment,notes,items,total,status,channel,created_at,updated_at,email,payment_mode,ruc,receipt,dni,business_name) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(request_id) DO NOTHING")
+    .bind(id, data.requestId, fingerprint, channel === "web" ? user?.userId ?? null : null, user?.userId ?? null, customer.name, customer.phone, customer.address, customer.district, customer.kind, customer.payment, customer.notes, JSON.stringify(items), total, "pendiente", channel, now, now, customer.email ?? null, paymentMode, factura || customer.kind === "Empresa" ? customer.ruc ?? null : null, customer.receipt, factura ? null : customer.dni ?? null, factura ? customer.businessName ?? null : null).run();
   const saved = await db.prepare("SELECT id,total,fingerprint FROM orders WHERE request_id = ?").bind(data.requestId).first<{ id: string; total: number; fingerprint: string }>();
   if (!saved || saved.fingerprint !== fingerprint) return Response.json({ error: "No se pudo registrar este intento." }, { status: 409 });
   // Card payments are e-mailed when Izipay approves them; other web orders now.

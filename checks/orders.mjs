@@ -18,9 +18,15 @@ assert.equal((await order({district:"Comas"})).status,400);
 assert.equal((await order({district:"Surquillo"})).status,201);
 assert.equal((await order({district:"La Victoria (Santa Catalina)"})).status,201);
 assert.equal((await order({kind:"Empresa",district:"Comas"})).status,400);
-assert.equal((await order({kind:"Empresa",district:"Comas",ruc:"123"})).status,400);
-assert.equal((await order({kind:"Empresa",district:"Comas",ruc:"20123456789"})).status,201);
-assert.equal((await order({kind:"Empresa",district:"Planeta",ruc:"20123456789"})).status,400);
+assert.equal((await order({kind:"Empresa",district:"Comas",ruc:"20123456789",businessName:"Empresa QA SAC"})).status,400);
+assert.equal((await order({kind:"Empresa",district:"Comas",receipt:"Factura",ruc:"123",businessName:"Empresa QA SAC"})).status,400);
+assert.equal((await order({kind:"Empresa",district:"Comas",receipt:"Factura",ruc:"20123456789"})).status,400);
+assert.equal((await order({kind:"Empresa",district:"Comas",receipt:"Factura",ruc:"20123456789",businessName:"Empresa QA SAC"})).status,201);
+assert.equal((await order({kind:"Empresa",district:"Planeta",receipt:"Factura",ruc:"20123456789",businessName:"Empresa QA SAC"})).status,400);
+// Comprobante: boleta with optional DNI, or factura for a household with RUC and razón social.
+assert.equal((await order({receipt:"Boleta",dni:"45678912",email:"cliente@example.test"})).status,201);
+assert.equal((await order({receipt:"Boleta",dni:"123"})).status,400);
+assert.equal((await order({receipt:"Factura",ruc:"10456789123",businessName:"Persona QA"})).status,201);
 assert.equal((await call("/api/orders","POST",{...payload,channel:"vendedor"},outsider)).status,403);
 const created=await call("/api/orders","POST",payload);assert.equal(created.status,201);assert.equal(created.data.total,9000);
 const again=await call("/api/orders","POST",payload);assert.equal(again.status,200);assert.equal(again.data.id,created.data.id);

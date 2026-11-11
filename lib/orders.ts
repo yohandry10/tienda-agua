@@ -23,12 +23,17 @@ export const orderSchema=z.object({
  phone:z.string().trim().max(18).regex(/^[+]?[0-9 ()-]{9,18}$/).refine(v=>v.replace(/\D/g,"").length>=9),
  address:z.string().trim().min(8).max(180),district:z.string().max(60),
  kind:z.enum(["Hogar","Empresa"]),payment:z.enum(["Efectivo al recibir","Yape o Plin","Transferencia","Pago online (Izipay)"]),
+ receipt:z.enum(["Boleta","Factura"]).default("Boleta"),
  ruc:z.string().trim().regex(/^(10|15|17|20)\d{9}$/).optional(),
+ businessName:z.string().trim().min(3).max(150).optional(),
+ dni:z.string().trim().regex(/^\d{8}$/).optional(),
  email:z.string().trim().email().max(150).optional(),
  notes:z.string().trim().max(250).default("")
  }).strict().refine(customer=>districtsFor(customer.kind).includes(customer.district),{message:"Revisa la cobertura de entrega."})
 }).strict().refine(data=>data.customer.payment!=="Pago online (Izipay)" || Boolean(data.customer.email),{message:"Revisa tu correo electrónico."})
- .refine(data=>data.customer.kind!=="Empresa" || data.channel==="vendedor" || Boolean(data.customer.ruc),{message:"Revisa el RUC de tu empresa."});
+ // Web orders: an Empresa always gets a factura, and a factura needs the RUC and razón social to be issued in SUNAT.
+ .refine(data=>data.channel==="vendedor" || data.customer.kind!=="Empresa" || data.customer.receipt==="Factura",{message:"Revisa el comprobante."})
+ .refine(data=>data.channel==="vendedor" || data.customer.receipt!=="Factura" || Boolean(data.customer.ruc && data.customer.businessName),{message:"Revisa el RUC y la razón social."});
 export function calculateItems(items:{id:string;qty:number}[]) {
  const seen=new Set<string>();
  return items.map(i=>{
