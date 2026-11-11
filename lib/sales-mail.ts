@@ -3,7 +3,7 @@ import { database } from "@/lib/orders";
 import { money } from "@/lib/catalog";
 import type { PaymentFields } from "@/lib/izipay-signature";
 
-const SALES_EMAIL = "ventasb2b@aguavaiyo.com";
+const SALES_EMAIL = "clientesc@aguavaiyo.com";
 const FROM = "VAIYO Web <pedidos@aguavaiyo.com>";
 type MailOrder = { id: string; name: string; phone: string; email: string | null; address: string; district: string; kind: string; ruc: string | null; payment: string; notes: string; items: string; total: number; created_at: string };
 
